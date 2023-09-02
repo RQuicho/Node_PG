@@ -5,7 +5,7 @@ const db = require("../db");
 
 router.get('/', async (req, res, next) => {
     try {
-        const results = await db.query(`SELECT * FROM companies`);
+        const results = await db.query(`SELECT * FROM companies ORDER BY name`);
         return res.json({ companies: results.rows});
     } catch(e) {
         return next(e);
@@ -52,8 +52,8 @@ router.put('/:code', async (req, res, next) => {
 router.delete('/:code', async (req, res, next) => {
     try {
         const {code} = req.params;
-        const results = await db.query(`DELETE FROM companies WHERE code=$1`, [code]);
-        if (code === ) {
+        const results = await db.query(`DELETE FROM companies WHERE code=$1 RETURNING code`, [code]);
+        if (results.rows.length === 0) {
             throw new ExpressError(`Cannot find company with code ${code}`, 404);
         }
         return res.send({status: 'deleted'});
